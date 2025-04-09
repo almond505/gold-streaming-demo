@@ -39,24 +39,23 @@ export S3_BUCKET_NAME=your-bucket-name
 export S3_PREFIX=gold_price
 ```
 
-## Project Structure
-
-```
-gold_streaming_demo/
-├── gold_streaming_demo/
-│   ├── __init__.py
-│   ├── assets.py          # Dagster assets
-│   ├── config.py          # Configuration management
-│   └── kafka_utils/
-│       ├── producer.py    # Kafka producer
-│       └── consumer.py    # Kafka consumer
-├── scripts/
-│   └── kafka_start.sh     # Kafka startup script
-├── pyproject.toml         # Project dependencies
-└── dagster.yaml          # Dagster configuration
-```
 
 ## Usage
+
+### Setting Up Kafka Topics
+
+Before running the pipeline, you need to create the Kafka topic that will be used for streaming gold price data:
+
+1. Start Kafka and Zookeeper:
+```bash
+./scripts/kafka_start.sh
+```
+2. Setup topic
+```bash
+./scripts/create_kafka_topic.sh
+```
+
+### Running the Pipeline
 
 1. Start the Dagster UI:
 ```bash
