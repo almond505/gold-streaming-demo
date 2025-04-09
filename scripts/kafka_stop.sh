@@ -1,84 +1,20 @@
 #!/bin/bash
 
+echo "stop script"
 # Set error handling
 set -e
 
 # Default configuration
 ZOOKEEPER_PORT=2181
 KAFKA_PORT=9092
-KAFKA_VERSION="kafka_2.12-3.3.1"
+KAFKA_VERSION="kafka_2.13-3.9.0"
+
+KAFKA_HOME="$HOME/$KAFKA_VERSION"
 
 # Function to check if a command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
-
-# Function to find Kafka installation
-find_kafka() {
-    # Check common installation paths
-    local kafka_paths=(
-        "./$KAFKA_VERSION"
-        "../$KAFKA_VERSION"
-        "/usr/local/kafka"
-        "/opt/kafka"
-        "$HOME/kafka"
-    )
-    
-    for path in "${kafka_paths[@]}"; do
-        if [ -d "$path" ] && [ -f "$path/bin/kafka-server-stop.sh" ]; then
-            echo "$path"
-            return 0
-        fi
-    done
-    
-    # If not found, check if kafka is in PATH
-    if command_exists kafka-server-stop.sh; then
-        echo "kafka in PATH"
-        return 0
-    fi
-    
-    return 1
-}
-
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --zookeeper-port)
-            ZOOKEEPER_PORT="$2"
-            shift 2
-            ;;
-        --kafka-port)
-            KAFKA_PORT="$2"
-            shift 2
-            ;;
-        --kafka-version)
-            KAFKA_VERSION="$2"
-            shift 2
-            ;;
-        --help)
-            echo "Usage: $0 [options]"
-            echo "Options:"
-            echo "  --zookeeper-port <port>      Set Zookeeper port (default: 2181)"
-            echo "  --kafka-port <port>          Set Kafka port (default: 9092)"
-            echo "  --kafka-version <version>    Set Kafka version (default: kafka_2.12-3.3.1)"
-            echo "  --help                        Show this help message"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            echo "Use --help for usage information"
-            exit 1
-            ;;
-    esac
-done
-
-# Find Kafka installation
-KAFKA_HOME=$(find_kafka)
-
-if [ -z "$KAFKA_HOME" ]; then
-    echo "Error: Kafka installation not found. Please install Kafka or set KAFKA_HOME environment variable."
-    exit 1
-fi
 
 echo "Using Kafka installation at: $KAFKA_HOME"
 
