@@ -37,7 +37,13 @@ def fetch_gold_data(config: GoldPriceConfig) -> pd.DataFrame:
             period=config.period
         )
         gold_data.index = gold_data.index.tz_convert(config.timezone)
-        return gold_data.sort_values(by='Datetime', ascending=False)
+        gold_df_sorted = gold_data.sort_values(by='Datetime', ascending=False)
+        # 1. Join MultiIndex levels into strings
+        gold_df_sorted.columns = ['_'.join(map(str, col)).strip() for col in gold_df_sorted.columns]
+        # 2. Optional: remove '_GC=F' from column names
+        gold_df_sorted.columns = [col.replace('_GC=F', '') for col in gold_df_sorted.columns]
+        df = gold_df_sorted.reset_index()
+        return df
     except Exception as e:
         logger.error(f"Failed to fetch gold data: {str(e)}")
         raise
