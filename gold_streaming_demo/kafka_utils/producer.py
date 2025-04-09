@@ -10,7 +10,7 @@ from gold_streaming_demo.config import KafkaConfig, GoldPriceConfig
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s - Line %(lineno)d'
 )
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,7 @@ def create_producer(config: KafkaConfig) -> KafkaProducer:
     try:
         return KafkaProducer(
             bootstrap_servers=config.bootstrap_servers,
-            value_serializer=lambda v: json.dumps(v, default=str).encode('utf-8'),
+            value_serializer=lambda v: json.dumps(v).encode('utf-8'),
             acks='all',
             retries=3
         )
@@ -51,13 +51,14 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
             #     'data': row.to_dict()
             # }
             message = row.to_dict()
+            logger.info(f"Producing message: {message}")
             producer.send(topic, value=message)
-            logger.debug(f"Sent message: {message}")
+            logger.info(f"Sent message: {message}")
         producer.flush()
-        logger.info(f"Successfully produced {len(data)} messages to topic {topic}")
+        logger.info(f"Successfully produced messages to topic {topic}")
     except Exception as e:
         logger.error(f"Failed to produce messages: {str(e)}")
-        raise
+        raise e
 
 def run_producer():
     """Main function to run the producer."""
