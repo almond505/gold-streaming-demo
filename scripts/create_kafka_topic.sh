@@ -21,7 +21,6 @@ command_exists() {
 
 echo "Using Kafka installation at: $KAFKA_HOME"
 echo "Using bootstrap server: $BOOTSTRAP_SERVER"
-echo "Creating topic: $TOPIC_NAME"
 
 # Create the topic
 echo "Creating Kafka topic: $TOPIC_NAME"

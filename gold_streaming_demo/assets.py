@@ -2,8 +2,8 @@ from dagster import asset, Definitions, AssetExecutionContext
 import subprocess
 import logging
 from pathlib import Path
-from .kafka_utils.producer import main as run_producer_main
-from .kafka_utils.consumer import main as run_consumer_main
+from gold_streaming_demo.kafka_utils.producer import main as run_producer_main
+from gold_streaming_demo.kafka_utils.consumer import main as run_consumer_main
 
 # Configure logging
 logging.basicConfig(
