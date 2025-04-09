@@ -3,7 +3,7 @@ import json
 import logging
 from datetime import datetime
 from s3fs import S3FileSystem
-from ..config import KafkaConfig, S3Config
+from gold_streaming_demo.config import KafkaConfig, S3Config
 
 # Configure logging
 logging.basicConfig(

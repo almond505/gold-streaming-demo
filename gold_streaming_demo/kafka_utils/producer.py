@@ -5,7 +5,7 @@ import json
 import yfinance as yf
 import logging
 from datetime import datetime
-from ..config import KafkaConfig, GoldPriceConfig
+from gold_streaming_demo.config import KafkaConfig, GoldPriceConfig
 
 # Configure logging
 logging.basicConfig(
