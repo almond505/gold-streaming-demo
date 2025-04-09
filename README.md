@@ -32,10 +32,10 @@ poetry install
 
 3. Set up environment variables:
 ```bash
-export KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+export KAFKA_BOOTSTRAP_SERVERS=3.106.251.171:9092
 export KAFKA_TOPIC_NAME=gold_price_stream
 export KAFKA_CONSUMER_GROUP=gold_price_group
-export S3_BUCKET_NAME=your-bucket-name
+export S3_BUCKET_NAME=kafka-gold-bucket
 export S3_PREFIX=gold_price
 ```
 
@@ -45,6 +45,9 @@ export S3_PREFIX=gold_price
 ### Setting Up Kafka Topics
 
 Before running the pipeline, you need to create the Kafka topic that will be used for streaming gold price data:
+0.
+chmod +x scripts/kafka_start.sh 
+chmod +x scripts/create_kafka_topic.sh 
 
 1. Start Kafka and Zookeeper:
 ```bash

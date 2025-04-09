@@ -40,6 +40,7 @@ fi
 
 # Verify processes are stopped
 echo "Verifying processes are stopped..."
+sleep 5
 
 # Check if Kafka is still running
 if command_exists lsof; then
@@ -60,5 +61,3 @@ if command_exists lsof; then
         echo "Zookeeper stopped successfully"
     fi
 fi
-
-echo "Kafka and Zookeeper stopped successfully!" 

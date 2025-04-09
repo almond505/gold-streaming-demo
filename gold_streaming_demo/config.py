@@ -14,5 +14,5 @@ class GoldPriceConfig(Config):
     timezone: str = "Asia/Bangkok"
 
 class S3Config(Config):
-    bucket_name: str = os.getenv("S3_BUCKET_NAME", "kafka-demogold-price")
+    bucket_name: str = os.getenv("S3_BUCKET_NAME", "kafka-gold-bucket")
     prefix: str = os.getenv("S3_PREFIX", "gold_price") 
