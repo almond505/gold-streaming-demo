@@ -1,0 +1,22 @@
+[project]
+name = "gold-streaming-demo"
+version = "0.1.0"
+description = "Demo Project for self learning"
+authors = [
+    {name = "Almond"}
+]
+packages = [{ include = "gold_streaming_demo" }]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+dagster = "^1.6"
+kafka-python = "^2.0"
+pandas = "^2.0"
+yfinance = "^0.2"
+s3fs = "^2025.3.2"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
