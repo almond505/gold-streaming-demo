@@ -47,7 +47,7 @@ def start_producer(context: AssetExecutionContext):
         logger.error(f"Producer failed: {str(e)}")
         raise
 
-@asset(deps=[run_producer])
+@asset(deps=[start_producer])
 def start_consumer(context: AssetExecutionContext):
     """Run the gold price consumer."""
     try:
