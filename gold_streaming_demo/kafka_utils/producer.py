@@ -57,6 +57,7 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
             #     'data': row.to_dict()
             # }
             message = row.to_dict()
+            message['Datetime'] = message['Datetime'].isoformat()
             logger.info(f"Producing message: {message}")
             producer.send(topic, value=message)
             logger.info(f"Sent message: {message}")
