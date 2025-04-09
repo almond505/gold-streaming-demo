@@ -59,7 +59,7 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
         logger.error(f"Failed to produce messages: {str(e)}")
         raise
 
-def main():
+def run_producer():
     """Main function to run the producer."""
     try:
         kafka_config = KafkaConfig()
@@ -75,6 +75,3 @@ def main():
     finally:
         if 'producer' in locals():
             producer.close()
-
-if __name__ == "__main__":
-    main()

@@ -2,8 +2,8 @@ from dagster import asset, Definitions, AssetExecutionContext
 import subprocess
 import logging
 from pathlib import Path
-from gold_streaming_demo.kafka_utils.producer import main as run_producer_main
-from gold_streaming_demo.kafka_utils.consumer import main as run_consumer_main
+from gold_streaming_demo.kafka_utils.producer import run_producer
+from gold_streaming_demo.kafka_utils.consumer import run_consumer
 
 # Configure logging
 logging.basicConfig(
@@ -37,27 +37,27 @@ def start_kafka_server(context: AssetExecutionContext):
         raise
 
 @asset(deps=[start_kafka_server])
-def run_producer(context: AssetExecutionContext):
+def start_producer(context: AssetExecutionContext):
     """Run the gold price producer."""
     try:
         logger.info("Starting gold price producer...")
-        run_producer_main()
+        run_producer()
         logger.info("Gold price producer completed successfully.")
     except Exception as e:
         logger.error(f"Producer failed: {str(e)}")
         raise
 
 @asset(deps=[run_producer])
-def run_consumer(context: AssetExecutionContext):
+def start_consumer(context: AssetExecutionContext):
     """Run the gold price consumer."""
     try:
         logger.info("Starting gold price consumer...")
-        run_consumer_main()
+        run_consumer()
         logger.info("Gold price consumer completed successfully.")
     except Exception as e:
         logger.error(f"Consumer failed: {str(e)}")
         raise
 
 defs = Definitions(
-    assets=[start_kafka_server, run_producer, run_consumer]
+    assets=[start_kafka_server, start_producer, start_consumer]
 )

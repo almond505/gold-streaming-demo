@@ -55,7 +55,7 @@ def process_messages(consumer: KafkaConsumer, s3: S3FileSystem, config: S3Config
         logger.error(f"Error in message processing loop: {str(e)}")
         raise
 
-def main():
+def run_consumer():
     """Main function to run the consumer."""
     try:
         kafka_config = KafkaConfig()
@@ -73,6 +73,3 @@ def main():
     finally:
         if 'consumer' in locals():
             consumer.close()
-
-if __name__ == "__main__":
-    main()    
