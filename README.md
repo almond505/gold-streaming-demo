@@ -49,8 +49,7 @@ gold_streaming_demo/
 │   ├── config.py          # Configuration management
 │   └── kafka_utils/
 │       ├── producer.py    # Kafka producer
-│       ├── consumer.py    # Kafka consumer
-│       └── start_kafka.py # Kafka startup utility
+│       └── consumer.py    # Kafka consumer
 ├── scripts/
 │   └── kafka_start.sh     # Kafka startup script
 ├── pyproject.toml         # Project dependencies
@@ -58,16 +57,6 @@ gold_streaming_demo/
 ```
 
 ## Usage
-
-### Starting Kafka
-
-You can start Kafka using the Poetry script:
-
-```bash
-poetry run start-kafka
-```
-
-### Running the Pipeline
 
 1. Start the Dagster UI:
 ```bash

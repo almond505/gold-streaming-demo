@@ -1,11 +1,9 @@
 from dagster import asset, Definitions, AssetExecutionContext
 import subprocess
 import logging
-import sys
 from pathlib import Path
 from .kafka_utils.producer import main as run_producer_main
 from .kafka_utils.consumer import main as run_consumer_main
-from .kafka_utils.start_kafka import start_kafka
 
 # Configure logging
 logging.basicConfig(
@@ -19,10 +17,21 @@ def start_kafka_server(context: AssetExecutionContext):
     """Start Kafka and Zookeeper servers."""
     try:
         logger.info("Starting Kafka & Zookeeper...")
-        success = start_kafka()
-        if not success:
-            raise RuntimeError("Failed to start Kafka server")
+        script_path = Path("./scripts/kafka_start.sh")
+        if not script_path.exists():
+            raise FileNotFoundError(f"Kafka start script not found at {script_path}")
+        
+        result = subprocess.run(
+            [str(script_path)],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        logger.info(result.stdout)
         logger.info("Kafka & Zookeeper started successfully.")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to start Kafka: {e.stderr}")
+        raise
     except Exception as e:
         logger.error(f"Unexpected error starting Kafka: {str(e)}")
         raise
