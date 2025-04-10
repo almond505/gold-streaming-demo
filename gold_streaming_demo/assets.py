@@ -1,16 +1,18 @@
-from dagster import asset, Definitions, AssetExecutionContext
-import subprocess
 import logging
+import subprocess
 from pathlib import Path
-from gold_streaming_demo.kafka_utils.producer import run_producer
+
+from dagster import AssetExecutionContext, Definitions, asset
+
 from gold_streaming_demo.kafka_utils.consumer import run_consumer
+from gold_streaming_demo.kafka_utils.producer import run_producer
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
 
 @asset
 def start_kafka_server(context: AssetExecutionContext):
@@ -21,16 +23,13 @@ def start_kafka_server(context: AssetExecutionContext):
         stop_path = Path("./scripts/kafka_stop.sh")
         if not script_path.exists():
             raise FileNotFoundError(f"Kafka start script not found at {script_path}")
-        
+
         # Make script executable
         script_path.chmod(0o755)
         stop_path.chmod(0o755)
-        
+
         result = subprocess.run(
-            [str(script_path)],
-            check=True,
-            capture_output=True,
-            text=True
+            [str(script_path)], check=True, capture_output=True, text=True
         )
         logger.info(result.stdout)
         logger.info("Kafka & Zookeeper started successfully.")
@@ -40,6 +39,7 @@ def start_kafka_server(context: AssetExecutionContext):
     except Exception as e:
         logger.error(f"Unexpected error starting Kafka: {str(e)}")
         raise
+
 
 @asset(deps=[start_kafka_server])
 def start_producer(context: AssetExecutionContext):
@@ -52,6 +52,7 @@ def start_producer(context: AssetExecutionContext):
         logger.error(f"Producer failed: {str(e)}")
         raise
 
+
 @asset(deps=[start_producer])
 def start_consumer(context: AssetExecutionContext):
     """Run the gold price consumer."""
@@ -63,6 +64,5 @@ def start_consumer(context: AssetExecutionContext):
         logger.error(f"Consumer failed: {str(e)}")
         raise
 
-defs = Definitions(
-    assets=[start_kafka_server, start_producer, start_consumer]
-)
+
+defs = Definitions(assets=[start_kafka_server, start_producer, start_consumer])

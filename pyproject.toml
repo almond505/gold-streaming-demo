@@ -17,7 +17,53 @@ yfinance = "^0.2"
 s3fs = "^2025.3.2"
 dagster-webserver = "^1.10.9"
 
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.2.0"
+black = "^24.2.0"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+flake8-docstrings = "^1.7.0"
+flake8-bugbear = "^24.2.6"
+flake8-comprehensions = "^3.14.0"
+flake8-simplify = "^0.21.0"
+mypy = "^1.8.0"
+pyupgrade = "^3.15.0"
+autoflake = "^2.2.1"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

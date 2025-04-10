@@ -38,4 +38,4 @@ cd "$KAFKA_HOME"
 bin/kafka-topics.sh --list --bootstrap-server "$BOOTSTRAP_SERVER" | grep "$TOPIC_NAME"
 cd - > /dev/null
 
-echo "Kafka topic '$TOPIC_NAME' created successfully!" 
+echo "Kafka topic '$TOPIC_NAME' created successfully!"

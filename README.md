@@ -103,7 +103,7 @@ sh ./scripts/create_kafka_topic.sh
 sh ./scripts/kafka_stop.sh
 ```
 
-### Running the Pipeline
+### 📌 Running the Pipeline 📌
 
 1. Start the Dagster UI:
 ```bash
@@ -137,3 +137,37 @@ The following features are planned for future development:
   - Error tracking
   - Performance monitoring
   - Audit trails
+
+
+## Code Quality Tools
+
+This project uses pre-commit hooks to ensure code quality. The following tools are configured:
+
+- **black**: Code formatter
+- **isort**: Import sorter
+- **flake8**: Code linter with additional plugins:
+  - flake8-docstrings
+  - flake8-bugbear
+  - flake8-comprehensions
+  - flake8-simplify
+- **mypy**: Static type checker
+- **pyupgrade**: Python code upgrader
+
+### Setting up pre-commit hooks
+
+1. Install pre-commit in your environment:
+```bash
+poetry run pre-commit install
+```
+
+2. (Optional) Run pre-commit on all files:
+```bash
+poetry run pre-commit run --all-files
+```
+
+The hooks will automatically run on every commit, checking:
+- Code formatting (black)
+- Import sorting (isort)
+- Code style and documentation (flake8)
+- Type checking (mypy)
+- Python version compatibility (pyupgrade)
