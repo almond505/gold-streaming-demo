@@ -21,20 +21,20 @@ echo "Using Kafka installation at: $KAFKA_HOME"
 # Stop Kafka server
 echo "Stopping Kafka server..."
 if [ "$KAFKA_HOME" = "kafka in PATH" ]; then
-    kafka-server-stop.sh
+    kafka-server-stop.sh || true
 else
     cd "$KAFKA_HOME"
-    bin/kafka-server-stop.sh
+    bin/kafka-server-stop.sh || true
     cd - > /dev/null
 fi
 
 # Stop Zookeeper
 echo "Stopping Zookeeper..."
 if [ "$KAFKA_HOME" = "kafka in PATH" ]; then
-    zookeeper-server-stop.sh
+    zookeeper-server-stop.sh || true
 else
     cd "$KAFKA_HOME"
-    bin/zookeeper-server-stop.sh
+    bin/zookeeper-server-stop.sh || true
     cd - > /dev/null
 fi
 
