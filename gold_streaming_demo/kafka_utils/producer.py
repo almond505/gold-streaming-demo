@@ -6,6 +6,8 @@ import yfinance as yf
 import logging
 from datetime import datetime
 from gold_streaming_demo.config import KafkaConfig, GoldPriceConfig
+import signal
+import sys
 
 # Configure logging
 logging.basicConfig(
@@ -13,6 +15,15 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s - Line %(lineno)d'
 )
 logger = logging.getLogger(__name__)
+
+# Global flag for graceful shutdown
+running = True
+
+def signal_handler(signum, frame):
+    """Handle shutdown signals gracefully."""
+    global running
+    logger.info("Received shutdown signal. Cleaning up...")
+    running = False
 
 def create_producer(config: KafkaConfig) -> KafkaProducer:
     """Create and return a Kafka producer with the given configuration."""
@@ -52,6 +63,10 @@ def fetch_gold_data(config: GoldPriceConfig) -> pd.DataFrame:
 def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
     """Produce messages to Kafka topic."""
     try:
+        if data.empty:
+            logger.warning("No data to produce")
+            return
+            
         for _, row in data.iterrows():
             message = row.to_dict()
             message['Datetime'] = message['Datetime'].isoformat()
@@ -64,22 +79,50 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
         logger.error(f"Failed to produce messages: {str(e)}")
         raise e
 
-def run_producer():
-    """Main function to run the producer."""
+def run_producer(fetch_interval: int = 60):
+    """
+    Main function to run the producer continuously.
+    
+    Args:
+        fetch_interval (int): Time in seconds between data fetches
+    """
+    global running
+    
+    # Set up signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
     try:
         kafka_config = KafkaConfig()
         gold_config = GoldPriceConfig()
         
         producer = create_producer(kafka_config)
-        gold_data = fetch_gold_data(gold_config)
-        produce_messages(producer, gold_data, kafka_config.topic_name)
+        logger.info(f"Starting continuous data fetching with {fetch_interval}s interval")
         
+        while running:
+            try:
+                gold_data = fetch_gold_data(gold_config)
+                if not gold_data.empty:
+                    produce_messages(producer, gold_data, kafka_config.topic_name)
+                else:
+                    logger.warning("No data to process in this iteration")
+                
+                # Simple sleep with running flag check
+                if running:
+                    sleep(fetch_interval)
+                    
+            except Exception as e:
+                logger.error(f"Error in main loop: {str(e)}")
+                if running:
+                    sleep(5)  # Wait a bit before retrying on error
+                
     except Exception as e:
         logger.error(f"Producer failed: {str(e)}")
         raise
     finally:
         if 'producer' in locals():
             producer.close()
+            logger.info("Producer closed")
 
 # Add this to make the file executable as a standalone script
 if __name__ == "__main__":

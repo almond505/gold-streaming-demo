@@ -10,7 +10,7 @@ class KafkaConfig(Config):
 class GoldPriceConfig(Config):
     ticker_symbol: str = "GC=F"
     interval: str = "1m"
-    period: str = "5d"
+    period: str = "1d"
     timezone: str = "Asia/Bangkok"
 
 class S3Config(Config):
