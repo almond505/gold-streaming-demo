@@ -32,7 +32,7 @@ def save_to_s3(s3: S3FileSystem, data: dict, config: S3Config, count: int):
     """Save data to S3 with proper error handling."""
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        message_id = data.get('message_id')
+        message_id = data.get('Datetime')
         if message_id:
             filename = f"{config.prefix}_{message_id}.json"
         else:
