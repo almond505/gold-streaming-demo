@@ -6,6 +6,7 @@ import yfinance as yf
 import logging
 from datetime import datetime
 from gold_streaming_demo.config import KafkaConfig, GoldPriceConfig
+import hash
 
 # Configure logging
 logging.basicConfig(
@@ -53,12 +54,10 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
     """Produce messages to Kafka topic."""
     try:
         for _, row in data.iterrows():
-            # message = {
-            #     'timestamp': datetime.now().isoformat(),
-            #     'data': row.to_dict()
-            # }
             message = row.to_dict()
             message['Datetime'] = message['Datetime'].isoformat()
+            # Add a unique ID to each message
+            message['message_id'] = f"{message['Datetime']}_{hash(str(message))}"
             logger.info(f"Producing message: {message}")
             producer.send(topic, value=message)
             logger.info(f"Sent message: {message}")

@@ -32,11 +32,19 @@ def save_to_s3(s3: S3FileSystem, data: dict, config: S3Config, count: int):
     """Save data to S3 with proper error handling."""
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"{config.prefix}_{timestamp}_{count}.json"
+        message_id = data.get('message_id')
+        if message_id:
+            filename = f"{config.prefix}_{message_id}.json"
+        else:
+            filename = f"{config.prefix}_{timestamp}_{count}.json"
         s3_path = f"s3://{config.bucket_name}/{filename}"
         
-        with s3.open(s3_path, 'w') as file:
-            json.dump(data, file)
+        if not s3.exists(s3_path):
+            with s3.open(s3_path, 'w') as file:
+                json.dump(data, file)
+        else:
+            logger.info(f"{s3_path} already exists. Skipping.")
+
         logger.info(f"Successfully saved data to {s3_path}")
     except Exception as e:
         logger.error(f"Failed to save data to S3: {str(e)}")
