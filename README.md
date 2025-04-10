@@ -153,11 +153,11 @@ This project uses pre-commit hooks to ensure code quality. The following tools a
 
 - **black**: Code formatter
 - **isort**: Import sorter
-- **flake8**: Code linter with additional plugins:
+<!-- - **flake8**: Code linter with additional plugins:
   - flake8-docstrings
   - flake8-bugbear
   - flake8-comprehensions
-  - flake8-simplify
+  - flake8-simplify -->
 - **mypy**: Static type checker
 - **pyupgrade**: Python code upgrader
 
@@ -176,6 +176,6 @@ poetry run pre-commit run --all-files
 The hooks will automatically run on every commit, checking:
 - Code formatting (black)
 - Import sorting (isort)
-- Code style and documentation (flake8)
+<!-- - Code style and documentation (flake8) -->
 - Type checking (mypy)
 - Python version compatibility (pyupgrade)
