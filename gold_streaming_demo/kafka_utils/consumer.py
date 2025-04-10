@@ -3,6 +3,7 @@ import json
 import logging
 from datetime import datetime
 from s3fs import S3FileSystem
+from typing import Dict, Any
 from gold_streaming_demo.config import KafkaConfig, S3Config
 
 # Configure logging
@@ -13,7 +14,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def create_consumer(config: KafkaConfig) -> KafkaConsumer:
-    """Create and return a Kafka consumer with the given configuration."""
+    """Create and return a Kafka consumer with the given configuration.
+    
+    Args:
+        config (KafkaConfig): Configuration object containing Kafka settings
+        
+    Returns:
+        KafkaConsumer: Configured Kafka consumer instance
+        
+    Raises:
+        Exception: If consumer creation fails
+    """
     try:
         logger.info(f"Creating Kafka consumer with bootstrap servers: {config.bootstrap_servers}")
         return KafkaConsumer(
@@ -28,8 +39,18 @@ def create_consumer(config: KafkaConfig) -> KafkaConsumer:
         logger.error(f"Failed to create Kafka consumer: {str(e)}")
         raise
 
-def save_to_s3(s3: S3FileSystem, data: dict, config: S3Config, count: int):
-    """Save data to S3 with proper error handling."""
+def save_to_s3(s3: S3FileSystem, data: Dict[str, Any], config: S3Config, count: int) -> None:
+    """Save data to S3 with proper error handling.
+    
+    Args:
+        s3 (S3FileSystem): Configured S3 filesystem instance
+        data (Dict[str, Any]): Data to save to S3
+        config (S3Config): Configuration object containing S3 settings
+        count (int): Message counter for filename generation
+        
+    Raises:
+        Exception: If saving to S3 fails
+    """
     try:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         message_id = data.get('Datetime')
@@ -50,8 +71,17 @@ def save_to_s3(s3: S3FileSystem, data: dict, config: S3Config, count: int):
         logger.error(f"Failed to save data to S3: {str(e)}")
         raise
 
-def process_messages(consumer: KafkaConsumer, s3: S3FileSystem, config: S3Config):
-    """Process messages from Kafka and save to S3."""
+def process_messages(consumer: KafkaConsumer, s3: S3FileSystem, config: S3Config) -> None:
+    """Process messages from Kafka and save to S3.
+    
+    Args:
+        consumer (KafkaConsumer): Configured Kafka consumer instance
+        s3 (S3FileSystem): Configured S3 filesystem instance
+        config (S3Config): Configuration object containing S3 settings
+        
+    Raises:
+        Exception: If message processing fails
+    """
     try:
         for count, message in enumerate(consumer):
             try:
@@ -64,8 +94,18 @@ def process_messages(consumer: KafkaConsumer, s3: S3FileSystem, config: S3Config
         logger.error(f"Error in message processing loop: {str(e)}")
         raise
 
-def run_consumer():
-    """Main function to run the consumer."""
+def run_consumer() -> None:
+    """Main function to run the consumer.
+    
+    This function:
+    1. Creates a Kafka consumer
+    2. Sets up S3 filesystem connection
+    3. Processes messages from Kafka and saves them to S3
+    4. Handles cleanup on exit
+    
+    Raises:
+        Exception: If consumer setup or execution fails
+    """
     try:
         kafka_config = KafkaConfig()
         s3_config = S3Config()

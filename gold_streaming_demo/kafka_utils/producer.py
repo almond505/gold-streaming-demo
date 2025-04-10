@@ -5,6 +5,7 @@ import json
 import yfinance as yf
 import logging
 from datetime import datetime
+from typing import Dict, Any, Optional
 from gold_streaming_demo.config import KafkaConfig, GoldPriceConfig
 import signal
 import sys
@@ -19,14 +20,29 @@ logger = logging.getLogger(__name__)
 # Global flag for graceful shutdown
 running = True
 
-def signal_handler(signum, frame):
-    """Handle shutdown signals gracefully."""
+def signal_handler(signum: int, frame: Any) -> None:
+    """Handle shutdown signals gracefully.
+    
+    Args:
+        signum (int): Signal number
+        frame (Any): Current stack frame
+    """
     global running
     logger.info("Received shutdown signal. Cleaning up...")
     running = False
 
 def create_producer(config: KafkaConfig) -> KafkaProducer:
-    """Create and return a Kafka producer with the given configuration."""
+    """Create and return a Kafka producer with the given configuration.
+    
+    Args:
+        config (KafkaConfig): Configuration object containing Kafka settings
+        
+    Returns:
+        KafkaProducer: Configured Kafka producer instance
+        
+    Raises:
+        Exception: If producer creation fails
+    """
     try:
         logger.info(f"Creating Kafka producer with bootstrap servers: {config.bootstrap_servers}")
         return KafkaProducer(
@@ -40,7 +56,23 @@ def create_producer(config: KafkaConfig) -> KafkaProducer:
         raise
 
 def fetch_gold_data(config: GoldPriceConfig) -> pd.DataFrame:
-    """Fetch gold price data from Yahoo Finance."""
+    """Fetch gold price data from Yahoo Finance.
+    
+    Args:
+        config (GoldPriceConfig): Configuration object containing gold price settings
+        
+    Returns:
+        pd.DataFrame: DataFrame containing gold price data with columns:
+            - Datetime: Timestamp of the price
+            - Open: Opening price
+            - High: Highest price
+            - Low: Lowest price
+            - Close: Closing price
+            - Volume: Trading volume
+            
+    Raises:
+        Exception: If data fetching fails
+    """
     try:
         logger.info(f"Fetching gold data for {config.ticker_symbol}")
         gold_data = yf.download(
@@ -60,8 +92,17 @@ def fetch_gold_data(config: GoldPriceConfig) -> pd.DataFrame:
         logger.error(f"Failed to fetch gold data: {str(e)}")
         raise
 
-def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
-    """Produce messages to Kafka topic."""
+def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str) -> None:
+    """Produce messages to Kafka topic.
+    
+    Args:
+        producer (KafkaProducer): Configured Kafka producer instance
+        data (pd.DataFrame): DataFrame containing gold price data to send
+        topic (str): Name of the Kafka topic to produce to
+        
+    Raises:
+        Exception: If message production fails
+    """
     try:
         if data.empty:
             logger.warning("No data to produce")
@@ -79,12 +120,21 @@ def produce_messages(producer: KafkaProducer, data: pd.DataFrame, topic: str):
         logger.error(f"Failed to produce messages: {str(e)}")
         raise e
 
-def run_producer(fetch_interval: int = 60):
-    """
-    Main function to run the producer continuously.
+def run_producer(fetch_interval: int = 60) -> None:
+    """Main function to run the producer continuously.
+    
+    This function:
+    1. Sets up signal handlers for graceful shutdown
+    2. Creates a Kafka producer
+    3. Continuously fetches gold price data
+    4. Produces messages to Kafka topic
+    5. Handles errors and cleanup
     
     Args:
-        fetch_interval (int): Time in seconds between data fetches
+        fetch_interval (int, optional): Time in seconds between data fetches. Defaults to 60.
+        
+    Raises:
+        Exception: If producer setup or execution fails
     """
     global running
     

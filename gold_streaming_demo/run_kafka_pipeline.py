@@ -5,6 +5,7 @@ import os
 import sys
 import multiprocessing
 from pathlib import Path
+from typing import bool
 from gold_streaming_demo.kafka_utils.producer import run_producer
 from gold_streaming_demo.kafka_utils.consumer import run_consumer
 
@@ -15,8 +16,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def start_kafka_server():
-    """Start Kafka and Zookeeper servers."""
+def start_kafka_server() -> bool:
+    """Start Kafka and Zookeeper servers.
+    
+    Returns:
+        bool: True if Kafka and Zookeeper started successfully, False otherwise.
+    """
     try:
         logger.info("Starting Kafka & Zookeeper...")
         
@@ -74,8 +79,12 @@ def start_kafka_server():
         logger.error(traceback.format_exc())
         return False
 
-def run_producer_process():
-    """Run the gold price producer in a separate process."""
+def run_producer_process() -> bool:
+    """Run the gold price producer in a separate process.
+    
+    Returns:
+        bool: True if producer completed successfully, False otherwise.
+    """
     try:
         logger.info("Starting gold price producer...")
         run_producer()
@@ -87,8 +96,13 @@ def run_producer_process():
         logger.error(traceback.format_exc())
         return False
 
-def run_consumer_process():
-    """Run the gold price consumer in a separate process."""
+def run_consumer_process() -> bool:
+    """Run the gold price consumer in a separate process.
+    
+    Returns:
+        bool: True if consumer started successfully, False otherwise.
+        Note: This function may run indefinitely as it continuously consumes messages.
+    """
     try:
         logger.info("Starting gold price consumer...")
         run_consumer()
@@ -100,8 +114,18 @@ def run_consumer_process():
         logger.error(traceback.format_exc())
         return False
 
-def main():
-    """Main function to run the entire pipeline with producer and consumer running simultaneously."""
+def main() -> None:
+    """Main function to run the entire pipeline with producer and consumer running simultaneously.
+    
+    This function:
+    1. Starts the Kafka server
+    2. Waits for Kafka to initialize
+    3. Runs the producer and consumer in separate processes
+    4. Monitors the processes and handles graceful shutdown
+    
+    Returns:
+        None
+    """
     logger.info("Starting gold streaming pipeline...")
     
     # Step 1: Start Kafka server
