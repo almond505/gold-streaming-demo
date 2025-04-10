@@ -114,3 +114,26 @@ poetry run dagster dev -f gold_streaming_demo/assets.py -h 0.0.0.0 -p 3000
    - Start Kafka and Zookeeper
    - Run the producer to fetch and stream gold price data
    - Run the consumer to process and store data in S3
+
+## Future Development
+
+The following features are planned for future development:
+
+### 1. Orchestration
+- Implement Dagster for workflow orchestration (TODO)
+- Alternative orchestration tools to consider:
+  - Apache Airflow
+  - Prefect
+  - Luigi
+
+### 2. Environment Configuration
+- Create a `.env` file template for environment variables
+- Implement environment variable validation
+
+### 3. Logging and Monitoring
+- Implement structured logging using Python's logging module
+- Create a logging database for:
+  - Pipeline execution metrics
+  - Error tracking
+  - Performance monitoring
+  - Audit trails
