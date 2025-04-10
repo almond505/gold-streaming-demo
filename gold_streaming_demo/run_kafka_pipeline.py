@@ -5,6 +5,8 @@ import os
 import sys
 import multiprocessing
 from pathlib import Path
+from gold_streaming_demo.kafka_utils.producer import run_producer
+from gold_streaming_demo.kafka_utils.consumer import run_consumer
 
 # Configure logging
 logging.basicConfig(
@@ -17,80 +19,85 @@ def start_kafka_server():
     """Start Kafka and Zookeeper servers."""
     try:
         logger.info("Starting Kafka & Zookeeper...")
-        script_path = Path("./scripts/kafka_start.sh")
-        stop_path = Path("./scripts/kafka_stop.sh")
         
+        # Check if scripts directory exists
+        scripts_dir = Path("./scripts")
+        if not scripts_dir.exists():
+            logger.error(f"Scripts directory not found at {scripts_dir.absolute()}")
+            return False
+            
+        script_path = scripts_dir / "kafka_start.sh"
+        stop_path = scripts_dir / "kafka_stop.sh"
+        
+        # Check if scripts exist
         if not script_path.exists():
-            raise FileNotFoundError(f"Kafka start script not found at {script_path}")
+            logger.error(f"Kafka start script not found at {script_path.absolute()}")
+            return False
+            
+        if not stop_path.exists():
+            logger.warning(f"Kafka stop script not found at {stop_path.absolute()}")
         
-        # Make script executable
-        script_path.chmod(0o755)
-        stop_path.chmod(0o755)
+        # Make scripts executable
+        try:
+            script_path.chmod(0o755)
+            if stop_path.exists():
+                stop_path.chmod(0o755)
+        except Exception as e:
+            logger.error(f"Failed to make scripts executable: {str(e)}")
+            return False
         
+        # Run the start script with detailed output
+        logger.info(f"Executing Kafka start script: {script_path.absolute()}")
         result = subprocess.run(
             [str(script_path)],
             check=True,
             capture_output=True,
             text=True
         )
-        logger.info(result.stdout)
+        
+        # Log the output
+        if result.stdout:
+            logger.info(f"Kafka start script output: {result.stdout}")
+        if result.stderr:
+            logger.warning(f"Kafka start script warnings: {result.stderr}")
+            
         logger.info("Kafka & Zookeeper started successfully.")
         return True
     except subprocess.CalledProcessError as e:
         logger.error(f"Failed to start Kafka: {e.stderr}")
+        logger.error(f"Exit code: {e.returncode}")
+        logger.error(f"Command: {e.cmd}")
         return False
     except Exception as e:
         logger.error(f"Unexpected error starting Kafka: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 def run_producer_process():
     """Run the gold price producer in a separate process."""
     try:
         logger.info("Starting gold price producer...")
-        # Get the absolute path to the project root
-        project_root = Path(__file__).parent.parent.absolute()
-        
-        # Run the producer script
-        result = subprocess.run(
-            [sys.executable, "-m", "gold_streaming_demo.kafka_utils.producer"],
-            cwd=str(project_root),
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        logger.info(result.stdout)
+        run_producer()
         logger.info("Gold price producer completed successfully.")
         return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Producer failed: {e.stderr}")
-        return False
     except Exception as e:
-        logger.error(f"Unexpected error in producer: {str(e)}")
+        logger.error(f"Producer failed: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 def run_consumer_process():
     """Run the gold price consumer in a separate process."""
     try:
         logger.info("Starting gold price consumer...")
-        # Get the absolute path to the project root
-        project_root = Path(__file__).parent.parent.absolute()
-        
-        # Run the consumer script
-        result = subprocess.run(
-            [sys.executable, "-m", "gold_streaming_demo.kafka_utils.consumer"],
-            cwd=str(project_root),
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        logger.info(result.stdout)
-        logger.info("Gold price consumer completed successfully.")
+        run_consumer()
+        # Note: This function may run indefinitely
         return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Consumer failed: {e.stderr}")
-        return False
     except Exception as e:
-        logger.error(f"Unexpected error in consumer: {str(e)}")
+        logger.error(f"Consumer failed: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
         return False
 
 def main():
@@ -117,20 +124,33 @@ def main():
     producer_process.start()
     consumer_process.start()
     
-    # Wait for both processes to complete
+    # Wait for the producer to complete (it should finish after sending all data)
     producer_process.join()
-    consumer_process.join()
     
-    # Check if both processes completed successfully
+    # Check if producer completed successfully
     if producer_process.exitcode != 0:
         logger.error("Producer process failed.")
+        # Terminate the consumer process if producer failed
+        consumer_process.terminate()
         return
     
-    if consumer_process.exitcode != 0:
-        logger.error("Consumer process failed.")
-        return
+    logger.info("Producer completed successfully. Consumer is still running in the background.")
+    logger.info("The consumer will continue to process messages until manually stopped.")
+    logger.info("To stop the consumer, press Ctrl+C or close this terminal.")
     
-    logger.info("Gold streaming pipeline completed successfully.")
+    try:
+        # Keep the main process running to allow the consumer to continue
+        while consumer_process.is_alive():
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logger.info("Received interrupt signal. Stopping consumer...")
+        consumer_process.terminate()
+        consumer_process.join(timeout=5)
+        if consumer_process.is_alive():
+            logger.warning("Consumer did not terminate gracefully. Forcing termination.")
+            consumer_process.kill()
+    
+    logger.info("Gold streaming pipeline completed.")
 
 if __name__ == "__main__":
     main() 
