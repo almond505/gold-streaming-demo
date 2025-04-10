@@ -98,6 +98,11 @@ sh ./scripts/kafka_start.sh
 sh ./scripts/create_kafka_topic.sh
 ```
 
+4. Stop Kafka and Zookeeper:
+```bash
+sh ./scripts/kafka_stop.sh
+```
+
 ### Running the Pipeline
 
 1. Start the Dagster UI:
