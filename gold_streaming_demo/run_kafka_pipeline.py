@@ -16,9 +16,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 def start_kafka_server():
-    """Start Kafka and Zookeeper servers in the background."""
+    """Start Kafka and Zookeeper servers."""
     try:
-        logger.info("Starting Kafka & Zookeeper in the background...")
+        logger.info("Starting Kafka & Zookeeper...")
         
         # Check if scripts directory exists
         scripts_dir = Path("./scripts")
@@ -46,35 +46,28 @@ def start_kafka_server():
             logger.error(f"Failed to make scripts executable: {str(e)}")
             return False
         
-        # Run the start script in the background
-        logger.info(f"Executing Kafka start script in background: {script_path.absolute()}")
+        # Run the start script with detailed output
+        logger.info(f"Executing Kafka start script: {script_path.absolute()}")
+        result = subprocess.run(
+            [str(script_path)],
+            check=True,
+            capture_output=True,
+            text=True
+        )
         
-        # Use nohup to run the script in the background and redirect output to a log file
-        log_file = Path("./kafka_server.log")
-        with open(log_file, 'w') as f:
-            process = subprocess.Popen(
-                [str(script_path)],
-                stdout=f,
-                stderr=subprocess.STDOUT,
-                start_new_session=True  # This ensures the process continues running even if the parent process exits
-            )
-        
-        logger.info(f"Kafka server started with PID: {process.pid}")
-        logger.info(f"Kafka server logs are being written to: {log_file.absolute()}")
-        
-        # Give Kafka some time to start up
-        logger.info("Waiting for Kafka to initialize...")
-        time.sleep(15)
-        
-        # Check if the process is still running
-        if process.poll() is not None:
-            logger.error(f"Kafka server process exited with code: {process.returncode}")
-            with open(log_file, 'r') as f:
-                logger.error(f"Kafka server logs: {f.read()}")
-            return False
+        # Log the output
+        if result.stdout:
+            logger.info(f"Kafka start script output: {result.stdout}")
+        if result.stderr:
+            logger.warning(f"Kafka start script warnings: {result.stderr}")
             
-        logger.info("Kafka & Zookeeper started successfully in the background.")
+        logger.info("Kafka & Zookeeper started successfully.")
         return True
+    except subprocess.CalledProcessError as e:
+        logger.error(f"Failed to start Kafka: {e.stderr}")
+        logger.error(f"Exit code: {e.returncode}")
+        logger.error(f"Command: {e.cmd}")
+        return False
     except Exception as e:
         logger.error(f"Unexpected error starting Kafka: {str(e)}")
         import traceback
@@ -115,6 +108,10 @@ def main():
     if not start_kafka_server():
         logger.error("Failed to start Kafka server. Exiting.")
         return
+    
+    # Give Kafka some time to fully start
+    logger.info("Waiting for Kafka to initialize...")
+    time.sleep(10)
     
     # Step 2: Run the producer and consumer simultaneously
     logger.info("Starting producer and consumer simultaneously...")
