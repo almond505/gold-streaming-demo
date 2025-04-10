@@ -105,10 +105,18 @@ sh ./scripts/kafka_stop.sh
 
 ### 📌 Running the Pipeline 📌
 
-1. Start the Dagster UI:
+1. Run the pipeline
+```bash
+nohup poetry run python -m gold_streaming_demo.run_kafka_pipeline > output.log 2>&1 &
+```
+(Monitor with `tail -f output.log`)
+
+(Future) 1. Start the Dagster UI (When Dagster Implementation is done):
 ```bash
 poetry run dagster dev -f gold_streaming_demo/assets.py -h 0.0.0.0 -p 3000
 ```
+navigate to http://ec2instance-public-ipv4-address:3000/
+
 
 2. The pipeline will:
    - Start Kafka and Zookeeper
