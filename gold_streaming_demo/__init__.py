@@ -1,0 +1,1 @@
+"""Gold streaming demo."""
