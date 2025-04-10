@@ -73,3 +73,7 @@ def run_consumer():
     finally:
         if 'consumer' in locals():
             consumer.close()
+
+# Add this to make the file executable as a standalone script
+if __name__ == "__main__":
+    run_consumer()

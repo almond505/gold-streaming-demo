@@ -83,3 +83,7 @@ def run_producer():
     finally:
         if 'producer' in locals():
             producer.close()
+
+# Add this to make the file executable as a standalone script
+if __name__ == "__main__":
+    run_producer()

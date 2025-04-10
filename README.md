@@ -35,6 +35,7 @@ poetry install
 3. Set up environment variables:
 ```bash
 export KAFKA_BOOTSTRAP_SERVERS=3.106.251.171:9092
+export DAGSTER_HOME=~/dagster
 ```
 and other optional
 
@@ -56,6 +57,7 @@ sh ./scripts/kafka_start.sh
 ```bash
 sh ./scripts/create_kafka_topic.sh
 ```
+
 
 ### Running the Pipeline
 
