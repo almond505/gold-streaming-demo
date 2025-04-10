@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 def create_consumer(config: KafkaConfig) -> KafkaConsumer:
     """Create and return a Kafka consumer with the given configuration."""
     try:
+        logger.info(f"Creating Kafka consumer with bootstrap servers: {config.bootstrap_servers}")
         return KafkaConsumer(
             config.topic_name,
             bootstrap_servers=config.bootstrap_servers,

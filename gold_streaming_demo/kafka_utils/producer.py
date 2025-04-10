@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 def create_producer(config: KafkaConfig) -> KafkaProducer:
     """Create and return a Kafka producer with the given configuration."""
     try:
+        logger.info(f"Creating Kafka producer with bootstrap servers: {config.bootstrap_servers}")
         return KafkaProducer(
             bootstrap_servers=config.bootstrap_servers,
             value_serializer=lambda v: json.dumps(v).encode('utf-8'),
