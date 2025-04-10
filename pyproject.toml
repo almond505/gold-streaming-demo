@@ -9,12 +9,13 @@ packages = [{ include = "gold_streaming_demo" }]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.13"
 dagster = "^1.6"
 kafka-python = "^2.0"
 pandas = "^2.0"
 yfinance = "^0.2"
 s3fs = "^2025.3.2"
+dagster-webserver = "^1.10.9"
 
 
 [build-system]

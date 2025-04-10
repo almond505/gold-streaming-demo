@@ -18,8 +18,13 @@ def start_kafka_server(context: AssetExecutionContext):
     try:
         logger.info("Starting Kafka & Zookeeper...")
         script_path = Path("./scripts/kafka_start.sh")
+        stop_path = Path("./scripts/kafka_stop.sh")
         if not script_path.exists():
             raise FileNotFoundError(f"Kafka start script not found at {script_path}")
+        
+        # Make script executable
+        script_path.chmod(0o755)
+        stop_path.chmod(0o755)
         
         result = subprocess.run(
             [str(script_path)],
