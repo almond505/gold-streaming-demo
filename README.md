@@ -109,7 +109,11 @@ sh ./scripts/kafka_stop.sh
 ```bash
 nohup poetry run python -m gold_streaming_demo.run_kafka_pipeline > output.log 2>&1 &
 ```
-(Monitor with `tail -f output.log`)
+To Monitor or Kill Process
+``` bash
+tail -f output.log
+ps aux | grep run_kafka_pipeline | grep -v grep | awk '{print $2}' | xargs kill
+```
 
 (Future) 1. Start the Dagster UI (When Dagster Implementation is done):
 ```bash
