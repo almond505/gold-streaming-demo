@@ -2,7 +2,9 @@
 
 A real-time data pipeline for streaming gold price data using Kafka and AWS.
 
-![Pipeline Architecture](https://file.notion.so/f/f/dfde445b-a682-4c4a-8e17-3aa9ecc07c6c/6e41af5f-4ffb-411f-aca6-83f6f8b20939/Diagram.png?table=block&id=1d20c130-b082-80fc-b1a1-d1f1e314e790&spaceId=dfde445b-a682-4c4a-8e17-3aa9ecc07c6c&expirationTimestamp=1744358400000&signature=WagzCa_ByeBR7cgeJgKO7yr8Hwz-6t9eYVpOvgYsM4w&downloadName=Diagram.png)
+**Pipeline Architecture**
+![image](https://github.com/user-attachments/assets/de544bb3-0ecf-4662-ad49-bff4fb1c9006)
+
 
 ## Overview
 
